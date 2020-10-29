@@ -87,7 +87,7 @@ for app_name in app_names[:5]:
     print(category_ids)
     print(label_ids)
 
-for app_name in app_names_with_duplicate_data[2:]:
+for app_name in app_names_with_duplicate_data:
     print(app_name)
     apps = App.objects.filter(website_id=1, name=app_name)
     app_ids = []
@@ -125,8 +125,8 @@ for app_name in app_names_with_duplicate_data[2:]:
                     update_app.labels.add(label)
     print(update_app)
     print(f'TYPES: {update_app.types.all()}')
-    for at in update_app.types.all():
-        print(f'APP TYPE DETAILS: {AppTypeDetails.objects.get_or_create(app=update_app, app_type=at)}')
+    # for at in update_app.types.all():
+    #     print(f'APP TYPE DETAILS: {AppTypeDetails.objects.get_or_create(app=update_app, app_type=at, is_active=True)}')
     print(f'CATEGORIES: {update_app.categories.all()}')
     print(f'LABELS: {update_app.labels.all()}')
     delete_apps = App.objects.filter(id__in=app_ids)
@@ -136,20 +136,20 @@ for app_name in app_names_with_duplicate_data[2:]:
         print(f'TYPES: {a.types.all()}')
         print(f'CATEGORIES: {a.categories.all()}')
         print(f'LABELS: {a.labels.all()}')
-        if a.types.exists():
-            for apptype in a.types.all():
-                apptype_details, created = AppTypeDetails.objects.get_or_create(app=update_app, app_type=apptype)
-                if created:
-                    try:
-                        delete_app_apptype_details = AppTypeDetails.objects.get(app=a, app_type=apptype)
-                        apptype_details.is_active = delete_app_apptype_details.is_active
-                        apptype_details.is_rank = delete_app_apptype_details.is_rank
-                        apptype_details.is_recommended = delete_app_apptype_details.is_recommended
-                        apptype_details.rank = delete_app_apptype_details.rank
-                        apptype_details.recommended_rank = delete_app_apptype_details.recommended_rank
-                        apptype_details.save()
-                    except Exception as exc:
-                        print(f'No app type details: {a.id} -- {apptype.id} ({exc})')
+        # if a.types.exists():
+        #     for apptype in a.types.all():
+        #         apptype_details, created = AppTypeDetails.objects.get_or_create(app=update_app, app_type=apptype)
+        #         if created:
+        #             try:
+        #                 delete_app_apptype_details = AppTypeDetails.objects.get(app=a, app_type=apptype)
+        #                 apptype_details.is_active = delete_app_apptype_details.is_active
+        #                 apptype_details.is_rank = delete_app_apptype_details.is_rank
+        #                 apptype_details.is_recommended = delete_app_apptype_details.is_recommended
+        #                 apptype_details.rank = delete_app_apptype_details.rank
+        #                 apptype_details.recommended_rank = delete_app_apptype_details.recommended_rank
+        #                 apptype_details.save()
+        #             except Exception as exc:
+        #                 print(f'No app type details: {a.id} -- {apptype.id} ({exc})')
         AppTypeDetails.objects.filter(app=a).delete()
     delete_apps.delete()
 
@@ -253,12 +253,12 @@ for duplicate_label_name in duplicate_label_names_with_same_name:
         # print('TO DELETE')
         for duplicate_label in duplicate_labels:
             print('TO DELETE: ', duplicate_label, duplicate_label.types.all(), App.objects.filter(labels=duplicate_label).count())
-            duplicate_label_types = duplicate_label.types.exclude(pk__in=list(updated_label_types.values_list('pk', flat=True)))
+            # duplicate_label_types = duplicate_label.types.exclude(pk__in=list(updated_label_types.values_list('pk', flat=True)))
             # if duplicate_label_types.exists():
-                # print('TYPES TO ADD IN UPDATED LABEL')
-                # for duplicate_label_type in duplicate_label_types:
-                    # print(duplicate_label_type)
-                    # updated_label.types.add(duplicate_label_type)
+            #     print('TYPES TO ADD IN UPDATED LABEL')
+            #     for duplicate_label_type in duplicate_label_types:
+            #         print(duplicate_label_type)
+            #         updated_label.types.add(duplicate_label_type)
         duplicate_labels.delete()  # TO DELETE LABEL DATA
         print('')
 
@@ -268,7 +268,7 @@ apps = App.objects.filter(website_id=1)
 apps.count()
 565
 """
-for app in apps[5:]:
+for app in apps:
     print(app)
     if app.labels.exists():
         app_labels = app.labels.filter(name__in=duplicate_label_names_with_same_name)
